@@ -1,0 +1,17 @@
+version: '3'
+services:
+  frontend:
+    build:
+      context: "./docker-compose-web-ui"
+      args:
+        REACT_APP_BACKEND_SERVER: "http://localhost:8080"
+    container_name: docker-compose-web-ui
+    ports:
+      - 4000:80
+  backend:
+    build: ./docker-compose-http
+    container_name: docker-compose-http
+    environment:
+      - PORT=8082
+    ports:
+      - 8082:8082
