@@ -4,14 +4,18 @@ services:
     build:
       context: "./docker-compose-web-ui"
       args:
-        REACT_APP_BACKEND_SERVER: "http://localhost:8080"
+        REACT_APP_BACKEND_SERVER: "http://localhost:8082"
     container_name: docker-compose-web-ui
     ports:
       - 4000:80
   backend:
     build: ./docker-compose-http
     container_name: docker-compose-http
+    volumes:
+      - ${WORKSPACE_DIR}:/workspace
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - PORT=8082
+      - WORKSPACE=/workspace
     ports:
       - 8082:8082

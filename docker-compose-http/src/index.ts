@@ -5,7 +5,8 @@ import { ApiImpl, FindError } from './compose/api';
 import { ProjectError } from './compose/project';
 
 const port = process.env.PORT || 8080;
-const api = new ApiImpl('/home/filo/workspace');
+const workspace = process.env.WORKSPACE || '';
+const api = new ApiImpl(workspace);
 const app = express();
 
 type Params = { name: string };
@@ -24,9 +25,9 @@ const handleError = (res: Response) => (error: ProjectError | FindError | 'stopp
   }
 };
 
-app.use(cors({ credentials: true }));
+app.use(cors({ credentials: false }));
 
-app.get('hello', (_, res) => {
+app.get('/hello', (_, res) => {
   res.send('ok');
 });
 

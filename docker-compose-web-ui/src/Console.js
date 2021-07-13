@@ -1,30 +1,39 @@
 import { Paper } from "@material-ui/core";
+import { useEffect, useRef } from "react";
 
 export default function Console({ lines = [] }) {
+  const endRef = useRef();
 
-    const println = (line) => (
-        <p style={{margin: 0, marginBottom: 2}}>{ line }</p>
-    )
+  useEffect(() => {
+    if (endRef.current !== undefined) {
+      endRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [lines]);
 
-    const Background = () => ( 
-        <div style={{
-            background: '#393939',
-            color: '#ccc',
-            fontFamily: 'monospace',
-            padding: 10,
-            borderRadius: 5,
-            maxHeight: 200,
-            overflowY: "scroll"
+  const println = (line) => (
+    <p style={{ margin: 0, marginBottom: 2 }}>{line}</p>
+  );
 
-        }}>
-            {(lines.length ? lines : ['$']).map(println)}
-        </div>
-     )
+  const Background = () => (
+    <div
+      style={{
+        background: "#393939",
+        color: "#ccc",
+        fontFamily: "monospace",
+        padding: 10,
+        borderRadius: 5,
+        maxHeight: 200,
+        overflowY: "scroll",
+      }}
+    >
+      {(lines.length ? lines : ["$"]).map(println)}
+      <div ref={endRef}></div>
+    </div>
+  );
 
-    return (
-        <Paper style={{ padding: 10 }}>
-            <Background />
-
-        </Paper>
-    );
+  return (
+    <Paper style={{ padding: 10 }}>
+      <Background />
+    </Paper>
+  );
 }

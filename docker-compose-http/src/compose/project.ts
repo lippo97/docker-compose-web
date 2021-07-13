@@ -64,9 +64,9 @@ export class ProjectImpl implements Project {
 
       return [name, processes.map(parseProcess)] as [string, TopResultRecord[]];
     };
-    const parseOutput = ({ stdout, stderr }: Output): Either<ProjectError, TopResult> => {
-      if (stderr) {
-        return Left('splash');
+    const parseOutput = ({ stdout, stderr }: Output): Either<Stopped, TopResult> => {
+      if (stdout === '' || stderr !== '') {
+        return Left('stopped');
       }
       const containers = splitInSubarrays((x) => x === '', stdout.split('\n'));
       return Right(containers.map(parseContainer));
