@@ -36,10 +36,7 @@ function App() {
   const [projectState, setProjectState] = useState({});
 
   const tuple = (fst) => (snd) => [fst, snd];
-  const mapSnd = (f) => (arr) => arr.map(([fst, snd]) => [fst, f(snd)]);
   const pick = (k) => (obj) => obj[k];
-  const call = (method) => (obj) => obj[method]();
-  const filter = (pred) => (arr) => arr.filter(pred);
   const equal = (a) => (b) => a === b;
   const not = (predicate) => (x) => !predicate(x);
 
@@ -55,36 +52,37 @@ function App() {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    async function fetchProjects() {
-      try {
-        const empty = Symbol();
-        const requests = await Promise.all(
-          projects.map(
-            ({ name }) =>
-              axios
-                .get(`${baseUrl}/${baseName(name)}/top`)
-                .then(pick("status"))
-                .then(tuple(name))
-                .catch((err) => empty)
-            // .then(filter(x => console.log(x), true))
-          )
-        );
-        setProjectState(
-          _.chain(requests.filter(not(equal(empty))))
-            .keyBy(0)
-            .mapValues(1)
-            .value()
-        );
-      } catch (err) {
-        // console.error(err);
-      }
+  async function fetchProjects() {
+    try {
+      const empty = Symbol();
+      const requests = await Promise.all(
+        projects.map(
+          ({ name }) =>
+            axios
+              .get(`${baseUrl}/${baseName(name)}/top`)
+              .then(pick("status"))
+              .then(tuple(name))
+              .catch((err) => empty)
+          // .then(filter(x => console.log(x), true))
+        )
+      );
+      setProjectState(
+        _.chain(requests.filter(not(equal(empty))))
+          .keyBy(0)
+          .mapValues(1)
+          .value()
+      );
+    } catch (err) {
+      // console.error(err);
     }
+  }
 
+  useEffect(() => {
     fetchProjects();
   }, [projects]);
 
   const append = (elem) => (arr) => [...arr, elem];
+  const notEmpty = Symbol();
 
   const up = (name) => async () => {
     try {
@@ -92,6 +90,7 @@ function App() {
       const statusCode = (await axios.post(`${baseUrl}/${name}/up`)).status;
       if (statusCode === 200 || statusCode === 201) {
         setOutput(append(`${name} is now running!`));
+        fetchProjects();
       }
     } catch (err) {
       console.error(err);
@@ -105,6 +104,7 @@ function App() {
       const statusCode = (await axios.post(`${baseUrl}/${name}/down`)).status;
       if (statusCode === 200 || statusCode === 201) {
         setOutput(append(`${name} is now stopped!`));
+        fetchProjects();
       }
     } catch (err) {
       console.error(err);

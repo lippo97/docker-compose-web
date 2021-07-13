@@ -12,7 +12,7 @@ services:
     build: ./docker-compose-http
     container_name: docker-compose-http
     volumes:
-      - ${WORKSPACE_DIR}:/workspace
+      - ${WORKSPACE}:/workspace
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - PORT=8082
